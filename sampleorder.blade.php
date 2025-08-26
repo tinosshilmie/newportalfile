@@ -1,7 +1,26 @@
 @extends('layouts.master')
 
 @section('content')
-
+<!-- Select2 -->
+<link rel="stylesheet" href="{{ asset('frontend') }}/select2/select2.min.css">
+<script src="{{ asset('frontend') }}/select2/select2.min.js"></script>
+<script>
+  $(document).ready(function() {
+    
+  });
+</script>
+<style>
+  .select2-container--default .select2-selection--single {
+    height: 25px; 
+    padding: 0rem 0rem;
+    border: 1px solid;
+    border-radius: 0rem;
+  }
+.wider-dropdown {
+  min-width: 450px !important;
+  width: auto !important;
+}
+</style>
 <style>
 
 .progress {
@@ -98,7 +117,7 @@ var config = {
         ],
         onChange: function (event) {
 		if(event['target']=='doctorid'){
-		        $("#sku").attr("readonly", false);
+		        //$("#sku").attr("disabled", false);
                 //$("#skuqty").attr("readonly", false);
                 hcparray = $('#doctorid').val().split(' - ');
                 $('#remark').val('Attention to ' + hcparray[1] + '(' + hcparray[0] + ')') ;
@@ -122,7 +141,7 @@ var config = {
                         w2ui['grid1'].add(data.query);
                         w2ui['grid2'].clear();
                         w2ui['grid2'].add(data.query);
-                        $("#sku").attr("readonly", false);
+                        $("#sku").prop('disabled', false); // enable temporarily
                         //$("#skuqty").attr("readonly", false);
                 },
                     error: function (data) {
@@ -207,7 +226,7 @@ function addsku(){
     	var skuqty = $('#skuqty').val();
         var skuqtyrate = $('#skuqty').val()*$('#productrate').val();
     	var batchno = $('#batchno').val();
-        var productbatchno = $('#skulist [value="' + value + '"]').data('value') + "_" + $('#batchno').val();
+        var productbatchno = value + "_" + $('#batchno').val();
     	
         if(!value){
             w2alert('Please select sku');
@@ -235,27 +254,27 @@ function addsku(){
         skuarray = skulist.split(',');
         pbatchnolist = $( "#productbatchnolist" ).val().replace(/['"]+/g, '');
         productbatchnoarray = pbatchnolist.split(',');
-        productid = $('#skulist [value="' + value + '"]').data('value');
+        productid = value
         //if(skuarray.map(Number).includes(productid)){
         if(productbatchnoarray.includes(productbatchno)){
             let index = skuarray.map(Number).indexOf(productid);
         }else{
             var str1 = test;
-            var str2 = "'" + $('#skulist [value="' + value + '"]').data('value')+"'";
+            var str2 = "'" + value+"'";
             var str111 = testproductbatchno;
-            var str222 = "'" + $('#skulist [value="' + value + '"]').data('value')+"'";
+            var str222 = "'" + value+"'";
 
             var str11 = test1;
             var str22 = "'" + skuqty +"'";
             //if(str1.indexOf(str2) == -1){
             if(str111.indexOf(str222) == -1){
               if(test != ""){
-                test2 = test + ",'" + $('#skulist [value="' + value + '"]').data('value')+"'";
+                test2 = test + ",'" + value+"'";
                 test22 = test1 + ",'" + skuqty +"'";
                 test222 = testproductbatchno + ",'" + productbatchno +"'";
                 test2222 = test11 + ",'" + batchno +"'";
               }else{
-                test2 = "'" + $('#skulist [value="' + value + '"]').data('value')+"'";
+                test2 = "'" + value+"'";
                 test22 = "'" + skuqty +"'";
                 test222 = "'" + productbatchno +"'";
                 test2222 = "'" + batchno +"'";
@@ -297,7 +316,7 @@ function addsku(){
                 console.log(data);
                 w2ui['grid2'].clear();
                 w2ui['grid2'].add(data.query);
-	    	$("#sku").attr("readonly", false);
+                $("#sku").prop('disabled', false); // enable temporarily
                 //$("#skuqty").attr("readonly", false);
 	    },
             error: function (data) {
@@ -363,7 +382,7 @@ function deletesku(productid,batchno){
                 w2ui['grid1'].add(data.query);
                 w2ui['grid2'].clear();
                 w2ui['grid2'].add(data.query);
-                $("#sku").attr("readonly", false);
+                $("#sku").prop('disabled', false); // enable temporarily
                 //$("#skuqty").attr("readonly", false);
             },
             error: function (data) {
@@ -396,11 +415,6 @@ var config3 = {
                 { type: 'html',  id: 'item1',
                 html: function (item) {
                     var html =
-                      '<datalist id="skulist">'+
-                      @foreach (json_decode($skuoptionlist) as $query)
-                      '  <option data-value="{{ $query->id }}" value="{{ $query->text }}"></option>'+
-                      @endforeach
-                      '</datalist>'+
                       '<div style="padding: 3px 3px;margin-top:-5px;">'+
                         '<table style="border-spacing: 5px;border-collapse: separate;width:100%;">'+
                         '<tr>'+
@@ -414,7 +428,13 @@ var config3 = {
                             '<td></td>'+
                         '</tr>'+
                         '<tr>'+
-                            '<td><input id="sku" name="sku"  oninput="onInput()" list="skulist" style="width: 300px" placeholder="Search product"  autocomplete="off" readonly></td>'+
+                            //'<td><input id="sku" name="sku"  oninput="onInput()" list="skulist" style="width: 300px" placeholder="Search product"  autocomplete="off" readonly></td>'+
+                            '<td><select id="sku" name="sku"  oninput="onInput()" style="width: 300px" placeholder="Search product" disabled  >'+
+                            '  <option  value=""></option>'+
+                             skuOptions+
+                            '</select></td>'+
+
+                            '</td>'+
                             '<td><input id="skuqty" style="width: 50px" type="number" onchange="updatechekqty(this.value);" placeholder="Qty" min="0" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" readonly></td>'+
                             '<td><input id="checkqty" style="width: 50px" placeholder="Qty" value="0" readonly></td>'+
                             '<td>/</td>'+
@@ -435,6 +455,22 @@ var config3 = {
                     }
                 },
             ],
+            onRefresh: function () {
+            requestAnimationFrame(() => {
+                const $sku = $('#sku');
+                if ($sku.length && !$sku.hasClass('select2-hidden-accessible')) {
+                    $sku.select2(
+                        { 
+                            width: '300px', 
+                            placeholder: "Select Product",
+                            allowClear: true,
+                            dropdownCssClass: 'wider-dropdown'
+                        },
+                    );
+
+                }
+            });
+            },
             onClick: function (target, data) {
                 console.log(target);
             }
@@ -484,6 +520,10 @@ var config4 = {
         ]
     }
 }
+var skuOptions = `{!! collect(json_decode($skuoptionlist))->map(function($query) {
+    return "<option value='{$query->id}'>{$query->text}</option>";
+})->implode('') !!}`;
+
 var config2 = {
     layout: {
         name: 'layout2',
@@ -525,11 +565,6 @@ var config2 = {
                 { type: 'html',  id: 'item1',
                 html: function (item) {
                     var html =
-                      '<datalist id="skulist">'+
-                      @foreach (json_decode($skuoptionlist) as $query)
-                      '  <option data-value="{{ $query->id }}" value="{{ $query->text }}"></option>'+
-                      @endforeach
-                      '</datalist>'+
                       '<div style="padding: 3px 3px;margin-top:-5px;">'+
                         '<table style="border-spacing: 5px;border-collapse: separate;width:100%;">'+
                         '<tr>'+
@@ -543,7 +578,11 @@ var config2 = {
                             '<td></td>'+
                         '</tr>'+
                         '<tr>'+
-                            '<td><input id="sku" name="sku"  oninput="onInput()" list="skulist" style="width: 300px" placeholder="Search product"  autocomplete="off" readonly></td>'+
+                            //'<td><input id="sku" name="sku"  oninput="onInput()" list="skulist" style="width: 300px" placeholder="Search product"  autocomplete="off" readonly></td>'+
+                            '<td><select id="sku" name="sku"  oninput="onInput()" style="width: 300px" placeholder="Search product" disabled  >'+
+                            '  <option  value=""></option>'+
+                             skuOptions+
+                            '</select></td>'+
                             '<td><input id="skuqty" style="width: 50px" type="number" onchange="updatechekqty(this.value);" placeholder="Qty" min="0" onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" readonly></td>'+
                             '<td><input id="checkqty" style="width: 50px" placeholder="Qty" value="0" readonly></td>'+
                             '<td>/</td>'+
@@ -558,6 +597,22 @@ var config2 = {
                     }
                 }
             ],
+            onRefresh: function () {
+            requestAnimationFrame(() => {
+                const $sku = $('#sku');
+                if ($sku.length && !$sku.hasClass('select2-hidden-accessible')) {
+                    $sku.select2(
+                        { 
+                            width: '300px', 
+                            placeholder: "Select Product",
+                            allowClear: true,
+                            dropdownCssClass: 'wider-dropdown'
+                        },
+                    );
+
+                }
+            });
+            },
             onClick: function (target, data) {
                 console.log(target);
             }
@@ -574,7 +629,7 @@ var config2 = {
             { field: 'action', text: 'Action', size: '60px' ,
             render: function (record) { 
                var html; 
-               html = '<center><i class="fa fa-times" onclick="deletesku('+record.recid+','+record.batchno+');"></i></center>'; 
+               html = '<center><i class="fa fa-times" onclick="deletesku('+record.recid+',\''+record.batchno+'\');"></i></center>'; 
             return html; } 
             }
         ],
@@ -606,23 +661,19 @@ var config2 = {
 };
 
 function onInput() {
-    
     if(document.getElementById("sku").value==""){
         $( "#balqty" ).val(0);
         $( "#skuqty" ).val(0);
     }else{
     w2ui['grid1'].lock();
     var val = document.getElementById("sku").value;
-    var opts = document.getElementById('skulist').childNodes;
-    for (var i = 0; i < opts.length; i++) {
-      if (opts[i].value === val) {
-        var codeno = val.split(" - ");
         var formData = {
           _token: "{{ csrf_token() }}",
-            codeno : codeno[0],
+            productid : val,
             orderno : w2ui['form'].record['orderno'],
             doctorid : w2ui['form'].record['doctorid']['id']
         };
+        console.log(formData);
         $.ajax({
             type: 'POST',
             url: '/getbalqty',
@@ -645,12 +696,6 @@ function onInput() {
                 w2alert('Error4.');
             }
         });
-        // An item was selected from the list!
-        // yourCallbackHere()
-        //alert(opts[i].value);
-        break;
-      }
-    }
     }
   }
 function getbalqty() {
@@ -778,6 +823,8 @@ function openPopup(status,territorytypeid,doctorid,orderby,source,type) {
         body    : '<div id="main" style="position: absolute; left: 5px; top: 5px; right: 5px; bottom: 5px;"></div>',
         
         buttons:  btn,
+        modal   : true,
+        keyboard: true,  // enable custom keyboard handling
         onOpen  : function (event) {
             event.onComplete = function () {
             var formData = {
@@ -833,7 +880,8 @@ function openPopup(status,territorytypeid,doctorid,orderby,source,type) {
                         }
                         if(w2ui['form'].record['doctorid']['id']==undefined){
                         }else{
-                            $("#sku").attr("readonly", false);
+                            
+                            $("#sku").prop('disabled', false); // enable temporarily
                             $("#skuqty").attr("readonly", false);
                             $("#batchno").attr("readonly", false);
                         }
@@ -841,6 +889,7 @@ function openPopup(status,territorytypeid,doctorid,orderby,source,type) {
                     error: function (data) {
                         w2alert('Error.');
                     }
+
                 });
 
 
@@ -852,6 +901,16 @@ function openPopup(status,territorytypeid,doctorid,orderby,source,type) {
               });
             };
         },
+        onKeydown(event) {
+            if (event.originalEvent && (event.originalEvent.key === 'Escape' || event.originalEvent.keyCode === 27)) {
+              event.originalEvent.preventDefault();
+              event.preventDefault(); // Prevent the default close behavior
+              console.log('Escape pressed — closing disabled.');
+              // Optionally, close popup manually under certain conditions:
+              // w2popup.close();
+              // Or run fallback logic here.
+            }
+          },
         onToggle: function (event) {
             event.onComplete = function () {
                 w2ui.layout.resize();
@@ -1295,6 +1354,16 @@ function cleardateresigned() {
   w2ui['form'].refresh();
 }
 </script>
+<style>
+/* Force Select2 dropdown to be above W2UI layers */
+.select2-container {
+    z-index: 9999 !important;
+    position: relative;
+}
+.select2-dropdown {
+    z-index: 99999 !important;
+}
+</style>
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <div class="content-header">
@@ -1337,11 +1406,11 @@ table.dataTable tbody th, table.dataTable tbody td {
         <div class="col-lg-12 col-12">
             <input type="hidden" id="thisstatus">
             <input type="hidden" id="thisterritorytypeid">
-            <input type="text" id="productlist">
-            <input type="text" id="qtylist">
-            <input type="hidden" id="batchnolist">
+            <input type="hidden" id="productlist">
+            <input type="hidden" id="qtylist">
+            <input type="hidden" id="batchnolist"> 
             <input type="hidden" id="productbatchnolist">
-            <input type="text" id="productrate">
+            <input type="hidden" id="productrate">
             Reference No
             <input type="text" id="searchreference" style="width:80px;">
             Order No
